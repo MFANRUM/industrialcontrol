@@ -5,7 +5,10 @@ module.exports = {
             builderOptions: {
                 nsis: {},
                 asar: false,
-                publish: ['github'],
+                publish: [{
+                    "provider": "generic",
+                    "url": "http://101.34.165.99:8088"
+                }],
             }
         }
     }

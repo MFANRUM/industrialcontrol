@@ -7,7 +7,9 @@
         title="设备信息"
         :visible.sync="drawer"
         :direction="direction"
-        :with-header="true">
+        :with-header="true"
+        class="flex-column"
+        style="align-items: center">
       <div class="flex-row" style="justify-content: space-around">
         <el-select v-model="value" size="mini" style="width: 140px" placeholder="请选择">
           <el-option
@@ -32,8 +34,11 @@
       </div>
     </el-drawer>
     <div class="flex-row"
-         style="justify-content: space-between;padding-left: 40px;padding-right:20px;align-items: center;height: 50px;">
-      <span style="font-size: 19px;color: #33d9ed">2021广东深汕西改扩建工程项目xx搅拌站监控系统</span>
+         style=";justify-content: space-between;padding-left: 30px;padding-right:20px;margin-top: 20px;margin-bottom:-20px;align-items: flex-start;height: 50px;">
+      <div class="flex-column">
+        <span style="font-size: 19px;color: #33d9ed">2021广东深汕西改扩建工程项目搅拌站监控系统</span>
+        <span style="font-size: 12px;color: whitesmoke">{{ dataInfo.DISCHARGINGTIME }}</span>
+      </div>
       <span style="font-size: 13px;color: aliceblue">{{ dataTime }} &nbsp;&nbsp;&nbsp;{{ low }}~{{ high }}</span>
     </div>
     <div class="flex-row" style="justify-content: center;align-items: center;width: 100%;height: 100%">
@@ -110,7 +115,12 @@
               <div class="body-message2 flex-row" style="">
                 <span style="color: red;font-size: 12px">{{ dataInfo.TEMPERATURE }} ℃</span>
               </div>
-              <img draggable="false" src="../assets/20220111-143308.gif" style="width: 330px;height: 200px;"
+              <img v-show="!cutAnimation" draggable="false" src="../assets/20220111-143308.gif"
+                   style="width: 330px;height: 200px;"
+                   alt="">
+<!--             当cutAnimation为true时,则最新获取的数据时间小于当前时间半个小时(非最新数据) -->
+              <img v-show="cutAnimation" draggable="false" src="../assets/20220114-100330.png"
+                   style="margin-left: 70px;margin-top:3px;width: 185px;height: 200px;"
                    alt="">
             </div>
             <!--          右侧-->
@@ -152,6 +162,7 @@ export default {
   data() {
     return {
       windowHeight: height,
+      cutAnimation: true,
       drawer: false,
       direction: 'ltr',
       itemId: '425c3af0-f8aa-4206-bfff-df9903f0602d',
@@ -173,7 +184,8 @@ export default {
         //矿粉
         CONSTRUCTKPOWDER: '',
         //骨料总重
-        CONSTRUCTW: ''
+        CONSTRUCTW: '',
+        DISCHARGINGTIME: ''
       },
       machineInfo: {
         ITEMNAME: "",
@@ -262,6 +274,10 @@ export default {
         responseType: 'json',
         data: param
       }).then(res => {
+        let delta_T =new Date().getTime() - new Date(res.data.rows[0].DTIME).getTime() > 1000 * 60 * 30
+        if (delta_T) {
+          this.cutAnimation = true
+        }
         this.dataInfo.CONSTRUCTGRAVEL1 = res.data.rows[0].CONSTRUCTGRAVEL1;
         this.dataInfo.CONSTRUCTGRAVEL2 = res.data.rows[0].CONSTRUCTGRAVEL2;
         this.dataInfo.CONSTRUCTGRAVEL3 = res.data.rows[0].CONSTRUCTGRAVEL3;
@@ -271,6 +287,7 @@ export default {
         this.dataInfo.TEMPERATURE = res.data.rows[0].TEMPERATURE;
         this.dataInfo.CONSTRUCTPITCH = res.data.rows[0].CONSTRUCTPITCH;
         this.dataInfo.CONSTRUCTKPOWDER = res.data.rows[0].CONSTRUCTKPOWDER;
+        this.dataInfo.DISCHARGINGTIME = res.data.rows[0].DTIME;
         this.dataInfo.CONSTRUCTW = Number(res.data.rows[0].CONSTRUCTGRAVEL1)
             + Number(res.data.rows[0].CONSTRUCTGRAVEL2)
             + Number(res.data.rows[0].CONSTRUCTGRAVEL3)
