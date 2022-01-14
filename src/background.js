@@ -24,6 +24,7 @@ async function createWindow() {
             webSecurity: false
         }
     })
+    //取消默认菜单栏
     Menu.setApplicationMenu(null)
     if (process.env.WEBPACK_DEV_SERVER_URL) {
         await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -33,6 +34,7 @@ async function createWindow() {
         createProtocol('app')
         win.loadURL('app://./index.html')
     }
+    //窗口最大化
     win.setFullScreen(true)
 
 }
@@ -55,8 +57,9 @@ app.on('ready', async () => {
             console.error('Vue Devtools failed to install:', e.toString())
         }
     }
+    //检查版本
     checkUpdate()
-
+    //创建窗口
     createWindow()
 })
 

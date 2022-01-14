@@ -165,6 +165,7 @@ export default {
       cutAnimation: true,
       drawer: false,
       direction: 'ltr',
+      //默认项目 021广东深汕西改扩建工程项目
       itemId: '425c3af0-f8aa-4206-bfff-df9903f0602d',
       equipmentTypeId: '2',
       options: [],
@@ -187,6 +188,7 @@ export default {
         CONSTRUCTW: '',
         DISCHARGINGTIME: ''
       },
+      //设备信息
       machineInfo: {
         ITEMNAME: "",
         MECHANISMNAME: "",
@@ -194,6 +196,7 @@ export default {
         SECTIONPROJECTNAME: "",
         VALUE: ""
       },
+      //日期
       dischargingtime: this.formatDate(new Date(new Date().getTime() - 24 * 60 * 60 * 1000)) + " - " + this.formatDate(new Date()),
       //  天气
       high: '',
@@ -210,6 +213,7 @@ export default {
     }, 1000 * 5)
   },
   methods: {
+    //切换设备
     switchingEquipment() {
       clearInterval(this.intervalId)
       this.findMachineInfo(this.value);
@@ -219,12 +223,14 @@ export default {
         this.RTData();
       }, 1000 * 5)
     },
+    //当前项目的所有设备列表
     findmachinelist() {
       let param = new URLSearchParams();
       param.append('ITEMID', this.itemId);
       param.append('EQUIPMENTTYPEID', this.equipmentTypeId)
       this.$axios.post('http://47.98.39.16:8988/mix/mixingmachineconfiguration/mixingmachineconfiguration!findmachinelist.do', param).then(res => {
         for (let i = 0; i < res.data.length; i++) {
+          //添加到下拉框
           this.options.push({
             value: res.data[i].EQUIPMENTCODE + '',
             label: res.data[i].MIXINGMACHINENAME + ''
@@ -232,6 +238,7 @@ export default {
         }
       })
     },
+    //天气信息
     weatherInfo() {
       axios.get('http://t.weather.itboy.net/api/weather/city/101280101').then(res => {
         let list = res.data.data.forecast[0];
@@ -240,6 +247,7 @@ export default {
         this.dataTime = this.formatDate(new Date()).split(' ', 1)[0]
       })
     },
+    //获取设备信息
     findMachineInfo(code) {
       let param = new URLSearchParams();
       param.append('equipmentCode', code);
@@ -248,8 +256,10 @@ export default {
         this.machineInfo.VALUE = code;
       })
     },
+    //获取最新数据
     RTData() {
       console.log("show-message")
+      //默认设备
       if (this.value == '') {
         this.findMachineInfo('GKJ0901')
       }
@@ -274,6 +284,7 @@ export default {
         responseType: 'json',
         data: param
       }).then(res => {
+        //获取的数据只取第一组数据,即最新数据
         let delta_T =new Date().getTime() - new Date(res.data.rows[0].DTIME).getTime() > 1000 * 60 * 30
         if (delta_T) {
           this.cutAnimation = true
@@ -296,6 +307,7 @@ export default {
             + Number(res.data.rows[0].CONSTRUCTSAND2);
       })
     },
+    //格式化时间
     formatDate(datetime) {
       var date = new Date(datetime); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
       var year = date.getFullYear(),
